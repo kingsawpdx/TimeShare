@@ -1,6 +1,11 @@
 # TimeShare
 A shared calendar for connected users.
 
+## Team Members:
+- Raghad Al Musawi
+- Sawyer King
+- Tazwell Borquist
+
 ## Core Features:
 - Display the users calendar along with the calendar of any connected users.
 - Allow the user to add, edit, and remove events on their calendar.
