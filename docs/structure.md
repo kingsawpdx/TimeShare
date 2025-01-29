@@ -12,4 +12,4 @@
 
 Below are possible technologies that can be utilized to create a backend for the project:
 
-- Express
+- Flask
