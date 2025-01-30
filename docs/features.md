@@ -16,3 +16,7 @@
   happening in that area.
 - Users can view the event details (e.g., name, time, location, and description).
 - If interested, users can add the event directly to their Google Calendar.
+- Users can create 'proposal' events that will notify connected users and allow them to r.s.v.p.
+- Users can plan lists. Ex. grocery lists, lists of items a user will bring to an event, etc.
+- Users to automatically search for available timeslots in specific calendar groups.
+- Users can create and set up named 'calendar groups' to allow calendar event sharing between specific users.
