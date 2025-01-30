@@ -17,4 +17,4 @@ A shared calendar for connected users.
 ## Technology:
 Front-End: This app will be built with React, Javascript, and deployed with Vercel.
 
-Back-end: TBD
+Back-end: Flask
