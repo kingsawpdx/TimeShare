@@ -18,3 +18,11 @@ A shared calendar for connected users.
 Front-End: This app will be built with React, Javascript, and deployed with Vercel.
 
 Back-end: Flask
+
+## How to run as a developer:
+
+You will need to run the front and back end on two different terminals if you want to be able to shut them off easily.
+
+To start the frontend: `yarn dev`
+
+To start the backend: `yarn start-api`

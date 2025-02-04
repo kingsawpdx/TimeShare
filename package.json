@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start-api": "cd api && .venv/bin/flask run --no-debugger"
   },
   "devDependencies": {
     "@types/react-dom": "^19.0.3",
@@ -15,5 +16,6 @@
   "dependencies": {
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
-  }
+  },
+  "proxy": "http://localhost:5000"
 }
