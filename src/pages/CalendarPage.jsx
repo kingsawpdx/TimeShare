@@ -1,21 +1,34 @@
-import React from 'react';
-import { useState,useEffect } from 'react';
+import React from "react";
+import { useState, useEffect } from "react";
+import FullCalendar from "@fullcalendar/react";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import dayGridPlugin from "@fullcalendar/daygrid";
 
 export default function CalendarPage() {
-  const [flaskHello, setFlaskHello] = useState('Error!');
+  const [currentEvents, setCurrentEvents] = useState([]);
 
   useEffect(() => {
-    fetch('/api/hello')
-      .then((res) => res.json())
-      .then((jdata) => {
-        setFlaskHello(jdata.hello);
+    fetch("../data.json")
+      .then((response) => response.json())
+      .then((data) => {
+        data.forEach((event) => {
+          setCurrentEvents((events) => [...events, event]);
+        });
       });
   }, []);
 
   return (
-    <div>
-      <h1>React App Boilerplate</h1>
-      <p> Hello! {flaskHello} </p>
-    </div>
+    <FullCalendar
+      plugins={[timeGridPlugin, dayGridPlugin]}
+      initialView="timeGridWeek"
+      headerToolbar={{
+        left: "prev,next today",
+        center: "title",
+        right: "timeGridWeek,dayGridMonth",
+      }}
+      slotMinTime={"08:00"}
+      firstDay={1}
+      events={currentEvents}
+    />
   );
 }
