@@ -4,9 +4,12 @@ import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import AddEvent from "../components/AddEvent";
+import CustomEvent from "../components/userEvent";
 
 export default function CalendarPage() {
+  const [totalEvents, setTotalEvents] = useState([]);
   const [currentEvents, setCurrentEvents] = useState([]);
+  const [users, setUsers] = useState([]);
   const [addEventPopUp, setAddEventPopUp] = useState(false);
 
   const displayAddEvent = () => setAddEventPopUp(true);
@@ -17,15 +20,40 @@ export default function CalendarPage() {
     setCurrentEvents((events) => [...events, eventData]);
   };
 
+  const loadEvents = (id) => {
+    setCurrentEvents((pastEvents) => [
+      ...pastEvents,
+      ...totalEvents.filter((event) => event.userId == id),
+    ]);
+  };
+
+  const login = (user) => {
+    if (totalEvents.length > 0) {
+      loadEvents(user.id);
+
+      user["linkedUsers"].forEach((linkedUserId) => loadEvents(linkedUserId));
+    }
+  };
+
+  //Initial fetch achieves the following:
+  // - stores all events in database in: totalEvents
+  // - stores all users in: users
+  // - simulates loggin in by setting the first user as 'loggedInUser'
   useEffect(() => {
     fetch("../data.json")
       .then((response) => response.json())
       .then((data) => {
-        data.forEach((event) => {
-          addEvent(event);
-        });
-      });
+        setTotalEvents(data["events"]);
+        setUsers(data["users"]);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
   }, []);
+
+  useEffect(() => {
+    if (users.length > 0 && totalEvents.length > 0) {
+      login(users[0]);
+    }
+  }, [totalEvents, users]);
 
   return (
     <>
@@ -39,7 +67,14 @@ export default function CalendarPage() {
         }}
         slotMinTime={"08:00"}
         firstDay={1}
-        events={currentEvents}
+        events={currentEvents.map((event) => ({
+          ...event,
+          backgroundColor: "whitesmoke",
+          borderColor: "transparent",
+        }))}
+        eventContent={(eventInfo) => (
+          <CustomEvent eventInfo={eventInfo} currentUsers={users} />
+        )}
       />
       <button
         onClick={displayAddEvent}

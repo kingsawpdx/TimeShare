@@ -1,0 +1,9 @@
+.fc-timegrid-slot.fc-timegrid-slot-lane:not(.fc-timegrid-slot-minor) {
+  border-top: none;
+}
+.fc-timegrid-slot-label:not(.fc-timegrid-slot-minor) {
+  border-top: none;
+}
+.fc-col-header-cell a {
+  text-decoration: none;
+}
