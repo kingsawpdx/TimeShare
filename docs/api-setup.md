@@ -1,8 +1,8 @@
 ## API setup on local machine
 
-To set up the flask API on your machine, first create a python virtual environment in this folder from the `api/` directory with:
+To set up the flask API on your machine, first create a python virtual environment in this folder from the root directory with:
 
-`cd api/ && python -m venv .venv`
+`python -m venv .venv`
 
 Next, activate the environment with:
 
