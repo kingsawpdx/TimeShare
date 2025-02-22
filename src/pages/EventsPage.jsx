@@ -1,5 +1,14 @@
-import React from "react";
+import React from 'react';
+import useApiData from '../components/useAPI_fetchHook';
 
 export default function EventsPage() {
-  return <h2>Welcome to the Events Page!</h2>
+  let url = '';
+  const { data: result, loading, error } = useApiData(url);
+  console.log('Result: ', result);
+
+  return (
+    <>
+      <h2>Welcome to the Events Page!</h2>
+    </>
+  );
 }
