@@ -1,12 +1,13 @@
 //import React, { useEffect, useState } from "react";
-import React from 'react';
-import NavMenu from './components/NavMenu';
+import React from "react";
+import NavMenu from "./components/NavMenu";
 
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import HomePage from './pages/HomePage';
-import CalendarPage from './pages/CalendarPage';
-import EventsPage from './pages/EventsPage';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import HomePage from "./pages/HomePage";
+import CalendarPage from "./pages/CalendarPage";
+import EventsPage from "./pages/EventsPage";
 
+import "./styles.css";
 
 function App() {
   return (
