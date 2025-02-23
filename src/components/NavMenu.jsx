@@ -16,7 +16,7 @@ function NavMenu() {
             className="d-inline-block align-center "
           />
 
-          <h5 className="text-secondary ms-2">Time Share</h5>
+          <h5 className="text-info ms-2">Time Share</h5>
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav " />
         <Navbar.Collapse id="basic-navbar-nav">
