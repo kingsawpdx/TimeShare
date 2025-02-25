@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Nav, Navbar, Container } from 'react-bootstrap';
 import calendar2week from './logo.svg';
 
-function NavMenu() {
+export default function NavMenu (){
   return (
     <Navbar bg="dark" variant="dark" expand="lg" sticky="top classname= ">
       <Container>
@@ -35,6 +35,4 @@ function NavMenu() {
       </Container>
     </Navbar>
   );
-}
-
-export default NavMenu;
+};

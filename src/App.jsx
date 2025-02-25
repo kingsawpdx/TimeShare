@@ -7,13 +7,12 @@ import HomePage from './pages/HomePage';
 import CalendarPage from './pages/CalendarPage';
 import EventsPage from './pages/EventsPage';
 
-
 function App() {
   return (
     <Router>
       <NavMenu />
       <Routes>
-        {/* <Route path="/" element={<HomePage />} /> */}
+        <Route path="/" element={<HomePage />} />
         <Route path="/home" element={<HomePage />} />
         <Route path="/calendar" element={<CalendarPage />} />
         <Route path="/search" element={<EventsPage />} />
