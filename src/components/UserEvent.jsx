@@ -6,7 +6,7 @@ const CustomEvent = (props) => {
 
   const getUserColorId = (eventData) => {
     for (const user of users) {
-      if (eventData.event.extendedProps.userId == user.id) {
+      if (eventData.event.extendedProps.userId == user.userId) {
         return user.eventColor;
       }
     }
