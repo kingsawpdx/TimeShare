@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Form, Container, Row, Col, Card } from "react-bootstrap";
-import backgroundImage from '../assets/images/ph1.jpg';
+import backgroundImage from "../assets/images/ph1.jpg";
 
 export default function HomePage() {
   const [email, setEmail] = useState("");
@@ -20,6 +20,16 @@ export default function HomePage() {
     }
   };
 
+  const loginWithGoogle = (e) => {
+    e.preventDefault();
+    try {
+      window.location.href = "http://localhost:8000/login";
+    } catch (error) {
+      console.error("Login redirection failed:", error);
+      alert("Failed to redirect to Google login. Please try again.");
+    }
+  };
+
   return (
     <div
       style={{
@@ -36,12 +46,26 @@ export default function HomePage() {
       <Container>
         <Row>
           <Col md={6}>
-            <Card style={{ padding: "2rem", borderRadius: "15px", boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)" }}>
+            <Card
+              style={{
+                padding: "2rem",
+                borderRadius: "15px",
+                boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
+              }}
+            >
               <Card.Body>
-                <h3 className="text-center" style={{ fontSize: "2rem", marginBottom: "1rem" }}>Login</h3>
-                <Form onSubmit={handleLogin}>
+                <h3
+                  className="text-center"
+                  style={{ fontSize: "2rem", marginBottom: "1rem" }}
+                >
+                  Login
+                </h3>
+                <Form>
                   {/* Email field */}
-                  <Form.Group controlId="formBasicEmail" style={{ marginBottom: "1.5rem" }}>
+                  <Form.Group
+                    controlId="formBasicEmail"
+                    style={{ marginBottom: "1.5rem" }}
+                  >
                     <Form.Label>Email address</Form.Label>
                     <Form.Control
                       type="email"
@@ -53,7 +77,10 @@ export default function HomePage() {
                   </Form.Group>
 
                   {/* Password field */}
-                  <Form.Group controlId="formBasicPassword" style={{ marginBottom: "1.5rem" }}>
+                  <Form.Group
+                    controlId="formBasicPassword"
+                    style={{ marginBottom: "1.5rem" }}
+                  >
                     <Form.Label>Password</Form.Label>
                     <Form.Control
                       type="password"
@@ -65,11 +92,37 @@ export default function HomePage() {
                   </Form.Group>
 
                   {/* Error message */}
-                  {error && <p className="text-danger" style={{ fontSize: "1rem", marginBottom: "1rem" }}>{error}</p>}
+                  {error && (
+                    <p
+                      className="text-danger"
+                      style={{ fontSize: "1rem", marginBottom: "1rem" }}
+                    >
+                      {error}
+                    </p>
+                  )}
 
                   {/* Login button */}
-                  <Button variant="primary" type="submit" className="w-100" style={{ padding: "1rem", fontSize: "1.2rem" }}>
+                  <Button
+                    variant="primary"
+                    type="submit"
+                    className="w-100"
+                    style={{ padding: "1rem", fontSize: "1.2rem" }}
+                    onClick={handleLogin}
+                  >
                     Login
+                  </Button>
+                  <Button
+                    variant="primary"
+                    type="submit"
+                    className="w-100"
+                    style={{
+                      marginTop: "10px",
+                      padding: "1rem",
+                      fontSize: "1.2rem",
+                    }}
+                    onClick={loginWithGoogle}
+                  >
+                    Login with Google
                   </Button>
                 </Form>
               </Card.Body>
