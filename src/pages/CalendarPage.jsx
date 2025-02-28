@@ -91,12 +91,12 @@ export default function CalendarPage({ onLogin }) {
         setUsers((users = []) => [
           ...users,
           {
-            userId: data.userId,
-            name: data.name,
-            eventColor: data.eventColor,
-            profileImage: data.picture,
-            linkedUsers: data.linkedUsers,
-            email: data.email,
+            userId: newUser.userId,
+            name: newUser.name,
+            eventColor: newUser.eventColor,
+            profileImage: newUser.picture,
+            linkedUsers: newUser.linkedUsers,
+            email: newUser.email,
           },
         ]);
         fetchCalendarsAndMerge(user.userId);
