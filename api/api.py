@@ -5,6 +5,7 @@ from flask_cors import CORS
 from flask_session import Session
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
+import random
 
 from api.google_utility.auth import (
     get_id_info,
@@ -141,24 +142,45 @@ def users():
 
         userId = request.args.get("userId")
 
-        try:
-            response = (
-                supabase.table("users")
-                .select("*")
-                .eq("userId", userId)
-                .execute()
-            )
+        if(userId):
 
-            user = response.data
+            try:
+                response = (
+                    supabase.table("users")
+                    .select("*")
+                    .eq("userId", userId)
+                    .execute()
+                )
 
-            if not user:
-                return jsonify({"error": "User not found"}), 404
-            return jsonify({"user": user[0]}), 200
-            
-        except Exception as error:
-            return jsonify({"error": str(error)}), 500
+                user = response.data
+
+                if not user:
+                    return jsonify({"error": "User not found"}), 404
+                return jsonify({"user": user[0]}), 200
+                
+            except Exception as error:
+                return jsonify({"error": str(error)}), 500
+        else:
+            try:
+                response = (
+                    supabase.table("users")
+                    .select("*")
+                    .execute()
+                )
+
+                users = response.data
+
+                if not users:
+                    return jsonify({"error": "Users not found"}), 404
+                return jsonify({"users": users}), 200
+                
+            except Exception as error:
+                return jsonify({"error": str(error)}), 500
+        
 
     elif request.method == 'POST':
+        colors = ['DarkOrange', 'Crimson', 'ForestGreen', 'Lavendar', 'SkyBlue', 'Teal', 'Tomato', 'Violet']
+        colorIndex = random.randRange(len(colors))
         try:
             user_data = request.get_json()
             
@@ -175,6 +197,8 @@ def users():
                     "userId": user_data["userId"],
                     "name": user_data["name"],
                     "email": user_data["email"],
+                    "eventColor": colors[colorIndex],
+                    "linkedUsers": "[]",
                     "profileImage": user_data["picture"],
                 })
                 .execute()
@@ -186,32 +210,40 @@ def users():
             return jsonify({"error": str(error)}), 500
     
     elif request.method == 'PATCH':
-        userId = request.args.get('userId')
+
+        
+
+        userId = str(request.args.get('userId'))
         userUpdate = request.get_json()
 
-        sendUser = {}
+        print("Received userId:", userId)  # Debugging log
+        print("Received userUpdate:", userUpdate)  # Debugging log
 
-        for key in userUpdate:
-            sendUser.push(key = userUpdate[key])
 
-        if not userUpdate or userId:
+        if not userUpdate or not userId:
             return jsonify({"error": "userUpdate and userId required"}), 400
         
         try:
             response = (
                 supabase.table("users")
                 .update({
-                        "name": userUpdate["name"],
-                        "eventColor": userUpdate["eventColor"],
-                        "profileImage": userUpdate["profileImage"],
-                        "linkedUsers": userUpdate["linkedUsers"]
+                        "name": userUpdate.get("name"),
+                        "eventColor": userUpdate.get("eventColor"),
+                        "profileImage": userUpdate.get("profileImage"),
+                        "linkedUsers": userUpdate.get("linkedUsers"),
+                        "email": userUpdate.get("email"),
+
                 })
-                .eq("id", userId)
+                .eq("userId", userId)
                 .execute()
             )
+            print("Supabase response:", response)  # Debugging log
+
         except Exception as error:
-            return jsonify({"error:": str(error)}), 500
-        return "Successfully updated user"
+            print("Error updating user:", str(error))  # Debugging log
+            return jsonify({"error": str(error)}), 500
+
+        return jsonify(response.data),200
     
 @app.route("/login")
 def login():
@@ -242,7 +274,7 @@ def callback():
         
         session["user_id"] = id_info.get("sub")
         session["name"] = id_info.get("name")
-        session["picture"] = id_info.get("picture")
+        session["profileImage"] = id_info.get("picture")
         session["email"] = id_info.get("email")
 
         session["credentials"] = {
@@ -268,7 +300,7 @@ def get_session():
             "logged_in": True,
             "userId" : session["user_id"],
             "name" : session["name"],
-            "picture": session['picture'],
+            "profileImage": session['profileImage'],
             'email': session['email']
 
         })

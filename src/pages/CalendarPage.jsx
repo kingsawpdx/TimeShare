@@ -5,10 +5,12 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import AddEvent from "../components/AddEvent";
 import CustomEvent from "../components/userEvent";
+import SearchBar from "../components/SearchBar";
 
-export default function CalendarPage({ onLogin }) {
+export default function CalendarPage({ onLogin, isLoggedIn }) {
   const [currentEvents, setCurrentEvents] = useState([]);
   const [users, setUsers] = useState([]);
+  const [loggedInUser, setLoggedInUser] = useState({});
   const [addEventPopUp, setAddEventPopUp] = useState(false);
 
   const displayAddEvent = () => setAddEventPopUp(true);
@@ -62,7 +64,15 @@ export default function CalendarPage({ onLogin }) {
             email: data.user.email,
           },
         ]);
-        fetchCalendarsAndMerge(user.userId);
+        setLoggedInUser({
+          userId: data.user.userId,
+          name: data.user.name,
+          eventColor: data.user.eventColor,
+          profileImage: data.user.picture,
+          linkedUsers: data.user.linkedUsers,
+          email: data.user.email,
+        });
+        fetchCalendarsAndMerge(user.userId, data.user.linkedUsers);
       } else if (response.status === 404) {
         console.log("\tUser not found, adding the user to the database...");
         const addUser = {
@@ -87,6 +97,7 @@ export default function CalendarPage({ onLogin }) {
 
         const newUser = await createResponse.json();
         console.log("\tUser added to database:", { newUser });
+        console.log(newUser.userId);
 
         setUsers((users = []) => [
           ...users,
@@ -99,12 +110,93 @@ export default function CalendarPage({ onLogin }) {
             email: newUser.email,
           },
         ]);
-        fetchCalendarsAndMerge(user.userId);
+        setLoggedInUser({
+          userId: newUser.user.userId,
+          name: newUser.user.name,
+          eventColor: newUser.user.eventColor,
+          profileImage: newUser.user.picture,
+          linkedUsers: newUser.user.linkedUsers,
+          email: newUser.user.email,
+        });
+        fetchCalendarsAndMerge(user.userId, newUser.user.linkedUsers);
       } else {
         throw new Error("Failed to fetch user");
       }
     } catch (error) {
       console.error("Error fetching or creating user:", error);
+    }
+  };
+
+  const fetchUsers = async () => {
+    console.log("Fetching all users...");
+    try {
+      const response = await fetch(`http://localhost:8000/users/`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("\tUsers in database:", data.users);
+        setUsers(data.users || []);
+      }
+    } catch (error) {
+      console.error("Error fetching all users:", error);
+    }
+  };
+
+  //Fetch all users
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const addLinkedUser = async (userId) => {
+    console.log(loggedInUser);
+    if (!userId || !loggedInUser) {
+      throw new Error(
+        "Couldnt link users: userId or loggedInUser not provided"
+      );
+    }
+    console.log("\tUpdating linked users...");
+    const updatedLinkedUsers = loggedInUser.linkedUsers
+      ? [...loggedInUser.linkedUsers, userId]
+      : [userId];
+
+    const updateUser = {
+      userId: loggedInUser.userId,
+      name: loggedInUser.name,
+      email: loggedInUser.email,
+      eventColor: loggedInUser.eventColor,
+      linkedUsers: updatedLinkedUsers,
+      profileImage: loggedInUser.profileImage,
+    };
+
+    const response = await fetch(
+      `http://localhost:8000/users/?userId=${loggedInUser.userId}`,
+      {
+        method: "PATCH",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updateUser),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to create user");
+    } else {
+      const newLinkedUserEvents = await fetchSupaBaseEvents(userId);
+      setCurrentEvents((pastEvents) => [
+        ...pastEvents,
+        ...(Array.isArray(newLinkedUserEvents)
+          ? newLinkedUserEvents
+          : [newLinkedUserEvents]),
+      ]);
+      console.log(currentEvents);
     }
   };
 
@@ -161,13 +253,23 @@ export default function CalendarPage({ onLogin }) {
 
       const data = await response.json();
       console.log("\t\tGoogle events:", { data });
+
       for (const event of data) {
-        googleEvents.push({
-          title: event["summary"],
-          start: formatDateTime(event["start"]["dateTime"]),
-          end: formatDateTime(event["end"]["dateTime"]),
-          userId: userId,
-        });
+        if (event["start"]["dateTime"]) {
+          googleEvents.push({
+            title: event["summary"],
+            start: formatDateTime(event["start"]["dateTime"]),
+            end: formatDateTime(event["end"]["dateTime"]),
+            userId: userId,
+          });
+        } else {
+          googleEvents.push({
+            title: event["summary"],
+            start: event["start"]["date"],
+            end: event["end"]["date"],
+            userId: userId,
+          });
+        }
       }
     } catch (error) {
       console.error("Failed to fetch session:", error);
@@ -206,10 +308,19 @@ export default function CalendarPage({ onLogin }) {
     return supaBaseEvents;
   };
 
-  const fetchCalendarsAndMerge = async (userId) => {
+  const fetchCalendarsAndMerge = async (userId, linkedUsers) => {
     console.log("Fetching events from user...");
     const googleEvents = await fetchGoogleEvents(userId);
     const supaBaseEvents = await fetchSupaBaseEvents(userId);
+
+    for (const user in linkedUsers) {
+      const linkedEvents = await fetchSupaBaseEvents(linkedUsers[user]);
+
+      setCurrentEvents((pastEvents) => [
+        ...pastEvents,
+        ...(Array.isArray(linkedEvents) ? linkedEvents : [linkedEvents]),
+      ]);
+    }
 
     const notInSupabase = eventsNotInSupabase(googleEvents, supaBaseEvents);
 
@@ -251,6 +362,7 @@ export default function CalendarPage({ onLogin }) {
 
   return (
     <>
+      <SearchBar addLinkedUser={addLinkedUser} loggedInUser={loggedInUser} />
       <FullCalendar
         plugins={[timeGridPlugin, dayGridPlugin]}
         initialView="timeGridWeek"
