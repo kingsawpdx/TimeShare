@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "start-api": "cd api && .venv/bin/flask run --no-debugger"
+    "start-api": "cd api && .venv/bin/flask run --cert=cert.pem --key=key.pem --no-debugger"
   },
   "devDependencies": {
     "@types/react-dom": "^19.0.3",

@@ -17,7 +17,7 @@ class AuthDB:
     Verifies a user's password
     @param user: auth.user.User instance
     @param skip_password_validation: Optional: skips password validation step
-    @return: True on successful verification False on unsuccessful verification
+    @return: True on successful verification
     @raises auth.exceptions.NoUserExistsError(name): When no user with 'name' exists in the database
     @raises argon2.exceptions.VerifyMismatchError: When password fails to match stored password's hash
     @raises argon2.exceptions.InvalidHashError: When stored hash is clearly not valid (Needs support)
@@ -30,7 +30,7 @@ class AuthDB:
         if len(user_found) == 0:
             raise NoUserExistsError(user)
         
-        self.ph.verify(user_found[0]["passhash"], user.password)
+        return self.ph.verify(user_found[0]["passhash"], user.password)
 
     """
     Creates a new user with a password

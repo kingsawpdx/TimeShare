@@ -10,5 +10,5 @@ class User:
     password: str
     is_password_valid: bool = False
 
-    def __post_init__(self, name, password):
-        object.__setattr__(self, 'is_password_valid', validate_password(password))
+    def __post_init__(self):
+        object.__setattr__(self, 'is_password_valid', all(validate_password(self.password).values()))

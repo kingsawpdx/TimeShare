@@ -24,5 +24,12 @@ dist-ssr
 *.sw?
 
 # Python virtual environment exclusions
-api/.venv
+**/.venv
 **/__pycache__
+
+# API Secrets
+*.pem
+
+# API Development
+**/auth-db.json
+**/sessions.json

@@ -6,3 +6,6 @@ class NoUserExistsError(Exception):
 
 class UserExistsError(Exception):
     pass
+
+class SessionExpiredError(Exception):
+    pass
