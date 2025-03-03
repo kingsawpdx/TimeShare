@@ -1,19 +1,17 @@
 import React, { useState } from 'react';
 import useApiData from '../components/useAPI_fetchHook';
-//import 'bootstrap/dist/css/bootstrap.min.css';
 
 export default function EventsPage() {
   const [searchTerm, setSearchTerm] = useState('music');
   const [stateCode, setStateCode] = useState('OR');
 
   const API_KEY = import.meta.env.VITE_API_KEY_EVENTS;
-  //const API_KEY = '4Tg48UlLIBDincgEA1HZmvynXAH2ITOg';
   const url = `https://app.ticketmaster.com/discovery/v2/events.json?apikey=${API_KEY}&keyword=${searchTerm}&countryCode=US&stateCode=${stateCode}`;
   const { data: result, loading, error } = useApiData(url);
 
   const uniqueEvents = result?._embedded?.events || [];
 
-  // Sort events by date before rendering
+
   const sortedEvents = uniqueEvents.sort((a, b) => {
     const dateA = new Date(a.dates?.start?.localDate);
     const dateB = new Date(b.dates?.start?.localDate);
