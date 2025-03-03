@@ -52,7 +52,9 @@ function App() {
         <Route path="/home" element={<HomePage />} />
         <Route
           path="/calendar"
-          element={<CalendarPage onLogin={handleLogin} />}
+          element={
+            <CalendarPage onLogin={handleLogin} isLoggedIn={isLoggedIn} />
+          }
         />
         <Route path="/search" element={<EventsPage />} />
       </Routes>
