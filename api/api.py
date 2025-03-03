@@ -179,16 +179,18 @@ def users():
         
 
     elif request.method == 'POST':
-        colors = ['DarkOrange', 'Crimson', 'ForestGreen', 'Lavendar', 'SkyBlue', 'Teal', 'Tomato', 'Violet']
-        colorIndex = random.randRange(len(colors))
+        colors = ['DarkOrange', 'Crimson', 'ForestGreen', 'SkyBlue', 'Teal', 'Tomato', 'Violet']
         try:
+
+            colorIndex = random.randrange(len(colors))
+
             user_data = request.get_json()
             
             new_user = {
                 "userId": user_data.get("userId"),
                 "name": user_data.get("name"),
                 "email": user_data.get("email"),
-                "profileImage": user_data.get("picture"),
+                "profileImage": user_data.get("profileImage"),
             }
 
             insert_response = (
@@ -198,8 +200,8 @@ def users():
                     "name": user_data["name"],
                     "email": user_data["email"],
                     "eventColor": colors[colorIndex],
-                    "linkedUsers": "[]",
-                    "profileImage": user_data["picture"],
+                    "linkedUsers": "{}",
+                    "profileImage": user_data["profileImage"],
                 })
                 .execute()
             )
@@ -211,14 +213,11 @@ def users():
     
     elif request.method == 'PATCH':
 
-        
-
         userId = str(request.args.get('userId'))
         userUpdate = request.get_json()
 
         print("Received userId:", userId)  # Debugging log
         print("Received userUpdate:", userUpdate)  # Debugging log
-
 
         if not userUpdate or not userId:
             return jsonify({"error": "userUpdate and userId required"}), 400
@@ -286,13 +285,11 @@ def callback():
                 "scopes": credentials.scopes,
             }
 
-
         return redirect(f"{FRONTEND_URL}/calendar?logged_in=true")
     except Exception as error:
         print(f"Error occured in callback: {error}")
         return redirect("/")
     
-
 @app.route("/session")
 def get_session():
     if "user_id" in session:
@@ -328,7 +325,7 @@ def get_events():
     try:
         
         startDate = "2025-02-01T00:00:00Z"
-        endDate = "2025-02-28T23:59:59Z"
+        endDate = "2026-02-28T23:59:59Z"
 
         service = build("calendar", "v3", credentials=credentials)
 

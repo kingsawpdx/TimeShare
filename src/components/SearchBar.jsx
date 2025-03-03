@@ -31,8 +31,6 @@ export default function SearchBar({ addLinkedUser, loggedInUser }) {
     fetchUsers();
   }, []);
 
-  console.log(loggedInUser);
-
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (searchRef.current && !searchRef.current.contains(event.target)) {

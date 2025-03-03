@@ -59,7 +59,7 @@ export default function CalendarPage({ onLogin, isLoggedIn }) {
             userId: data.user.userId,
             name: data.user.name,
             eventColor: data.user.eventColor,
-            profileImage: data.user.picture,
+            profileImage: data.user.profileImage,
             linkedUsers: data.user.linkedUsers,
             email: data.user.email,
           },
@@ -68,18 +68,19 @@ export default function CalendarPage({ onLogin, isLoggedIn }) {
           userId: data.user.userId,
           name: data.user.name,
           eventColor: data.user.eventColor,
-          profileImage: data.user.picture,
+          profileImage: data.user.profileImage,
           linkedUsers: data.user.linkedUsers,
           email: data.user.email,
         });
         fetchCalendarsAndMerge(user.userId, data.user.linkedUsers);
       } else if (response.status === 404) {
         console.log("\tUser not found, adding the user to the database...");
+        console.log(user.profileImage);
         const addUser = {
           userId: user.userId,
           name: user.name,
           email: user.email,
-          picture: user.picture,
+          profileImage: user.profileImage,
         };
 
         const createResponse = await fetch(`http://localhost:8000/users/`, {
@@ -105,7 +106,7 @@ export default function CalendarPage({ onLogin, isLoggedIn }) {
             userId: newUser.userId,
             name: newUser.name,
             eventColor: newUser.eventColor,
-            profileImage: newUser.picture,
+            profileImage: newUser.profileImage,
             linkedUsers: newUser.linkedUsers,
             email: newUser.email,
           },
@@ -114,7 +115,7 @@ export default function CalendarPage({ onLogin, isLoggedIn }) {
           userId: newUser.user.userId,
           name: newUser.user.name,
           eventColor: newUser.user.eventColor,
-          profileImage: newUser.user.picture,
+          profileImage: newUser.user.profileImage,
           linkedUsers: newUser.user.linkedUsers,
           email: newUser.user.email,
         });
@@ -173,6 +174,15 @@ export default function CalendarPage({ onLogin, isLoggedIn }) {
       linkedUsers: updatedLinkedUsers,
       profileImage: loggedInUser.profileImage,
     };
+
+    setLoggedInUser({
+      userId: loggedInUser.userId,
+      name: loggedInUser.name,
+      email: loggedInUser.email,
+      eventColor: loggedInUser.eventColor,
+      linkedUsers: updatedLinkedUsers,
+      profileImage: loggedInUser.profileImage,
+    });
 
     const response = await fetch(
       `http://localhost:8000/users/?userId=${loggedInUser.userId}`,
