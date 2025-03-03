@@ -6,6 +6,20 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import AddEvent from "../components/AddEvent";
 import CustomEvent from "../components/userEvent";
 
+export const formatDateTime = (isoString) => {
+  if (isoString == undefined) return;
+  if (!isoString.includes("T")) return isoString;
+
+  const date = new Date(isoString);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+
+  return `${year}-${month}-${day} ${hours}:${minutes}`;
+};
+
 export default function CalendarPage({ onLogin }) {
   const [currentEvents, setCurrentEvents] = useState([]);
   const [users, setUsers] = useState([]);
@@ -17,20 +31,6 @@ export default function CalendarPage({ onLogin }) {
   const addEvent = (eventData) => {
     addEventPopUp ? hideAddEvent() : 0;
     setCurrentEvents((events) => [...events, eventData]);
-  };
-
-  const formatDateTime = (isoString) => {
-    if (isoString == undefined) return;
-    if (!isoString.includes("T")) return isoString;
-
-    const date = new Date(isoString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    const hours = String(date.getHours()).padStart(2, "0");
-    const minutes = String(date.getMinutes()).padStart(2, "0");
-
-    return `${year}-${month}-${day} ${hours}:${minutes}`;
   };
 
   const fetchUser = async (user) => {
