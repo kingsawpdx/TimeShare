@@ -7,3 +7,70 @@
 .fc-col-header-cell a {
   text-decoration: none;
 }
+
+.searchBar {
+  margin: 0 auto;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  width: 80%;
+}
+
+.searchBar h3 {
+  white-space: nowrap;
+}
+
+.searchBar input {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.search-results li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+  background: white;
+}
+
+.search-results li:hover {
+  background: #f0f0f0;
+}
+
+.search-results img {
+  max-height: 30px;
+  border-radius: 100%;
+  margin-right: 10px;
+}
+
+.follow-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.follow-btn:hover {
+  background-color: #0056b3;
+}
