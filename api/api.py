@@ -76,13 +76,16 @@ def events():
         if not events:
             return jsonify({"error": "event is required"}), 400
         
+        if isinstance(events, dict):
+            events = [events]
+        
         try:
             response = (
                 supabase.table("events")
                 .insert([
                     {
-                        "title": event["title"],
-                        "userId": event["userId"],
+                        "title": event.get("title"),
+                        "userId": event.get("userId"),
                         "start": event.get("start"),
                         "end": event.get("end")
                     } 
@@ -91,7 +94,7 @@ def events():
                 .execute()
             )
 
-            return jsonify({"message": "Successfully added events", "count": len(events)})
+            return jsonify(response.data), 200
     
         except Exception as error:
             return jsonify({"error:": str(error)}), 500
