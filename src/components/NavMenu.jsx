@@ -3,7 +3,9 @@ import { Link } from "react-router-dom";
 import { Nav, Navbar, Container } from "react-bootstrap";
 import calendar2week from "./logo.svg";
 
+export default
 function NavMenu({ isLoggedIn, onLogout }) {
+
   return (
     <Navbar bg="dark" variant="dark" expand="lg" sticky="top classname= ">
       <Container>
@@ -48,6 +50,4 @@ function NavMenu({ isLoggedIn, onLogout }) {
       </Container>
     </Navbar>
   );
-}
-
-export default NavMenu;
+};

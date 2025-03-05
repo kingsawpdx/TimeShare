@@ -1,14 +1,11 @@
 //import React, { useEffect, useState } from "react";
 import React from "react";
 import { useState, useEffect } from "react";
-
 import NavMenu from "./components/NavMenu";
-
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import CalendarPage from "./pages/CalendarPage";
 import EventsPage from "./pages/EventsPage";
-
 import "./styles.css";
 
 function App() {
@@ -48,7 +45,7 @@ function App() {
     <Router>
       <NavMenu isLoggedIn={isLoggedIn} onLogout={handleLogout} />
       <Routes>
-        {/* <Route path="/" element={<HomePage />} /> */}
+        <Route path="/" element={<HomePage />} />
         <Route path="/home" element={<HomePage />} />
         <Route
           path="/calendar"

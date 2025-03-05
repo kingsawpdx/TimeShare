@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import useApiData from '../components/useAPI_fetchHook';
 
 export default function EventsPage() {
+
   const [searchTerm, setSearchTerm] = useState('music');
   const [stateCode, setStateCode] = useState('OR');
 
   const API_KEY = import.meta.env.VITE_API_KEY_EVENTS;
   const url = `https://app.ticketmaster.com/discovery/v2/events.json?apikey=${API_KEY}&keyword=${searchTerm}&countryCode=US&stateCode=${stateCode}`;
+
   const { data: result, loading, error } = useApiData(url);
 
   const uniqueEvents = result?._embedded?.events || [];
@@ -32,6 +34,7 @@ export default function EventsPage() {
   };
 
   return (
+
     <div className="container py-4">
       <h2 className="text-center mb-4">Search for Events</h2>
       <div className="mb-3 d-flex align-items-center gap-2">
@@ -162,5 +165,6 @@ export default function EventsPage() {
         ))}
       </div>
     </div>
+
   );
 }
