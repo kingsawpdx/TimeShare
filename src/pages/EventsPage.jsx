@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import useApiData from '../components/useAPI_fetchHook';
+import States from '../components/StatesList';
 
 export default function EventsPage() {
-
   const [searchTerm, setSearchTerm] = useState('music');
   const [stateCode, setStateCode] = useState('OR');
 
@@ -12,7 +12,6 @@ export default function EventsPage() {
   const { data: result, loading, error } = useApiData(url);
 
   const uniqueEvents = result?._embedded?.events || [];
-
 
   const sortedEvents = uniqueEvents.sort((a, b) => {
     const dateA = new Date(a.dates?.start?.localDate);
@@ -34,9 +33,10 @@ export default function EventsPage() {
   };
 
   return (
-
     <div className="container py-4">
-      <h2 className="text-center mb-4">Search for Events</h2>
+      <h2 className="text-center mb-4">
+        Discover Your Next Adventure—Find Events You’ll Love!
+      </h2>
       <div className="mb-3 d-flex align-items-center gap-2">
         <label className="form-label mb-0">Keyword:</label>
         <input
@@ -52,65 +52,25 @@ export default function EventsPage() {
           value={stateCode}
           onChange={(e) => setStateCode(e.target.value)}
         >
-          <option value="AL">Alabama</option>
-        	<option value="AK">Alaska</option>
-        	<option value="AZ">Arizona</option>
-        	<option value="AR">Arkansas</option>
-        	<option value="CA">California</option>
-        	<option value="CO">Colorado</option>
-        	<option value="CT">Connecticut</option>
-        	<option value="DE">Delaware</option>
-        	<option value="DC">District Of Columbia</option>
-        	<option value="FL">Florida</option>
-        	<option value="GA">Georgia</option>
-        	<option value="HI">Hawaii</option>
-        	<option value="ID">Idaho</option>
-        	<option value="IL">Illinois</option>
-        	<option value="IN">Indiana</option>
-        	<option value="IA">Iowa</option>
-        	<option value="KS">Kansas</option>
-        	<option value="KY">Kentucky</option>
-        	<option value="LA">Louisiana</option>
-        	<option value="ME">Maine</option>
-        	<option value="MD">Maryland</option>
-        	<option value="MA">Massachusetts</option>
-        	<option value="MI">Michigan</option>
-        	<option value="MN">Minnesota</option>
-        	<option value="MS">Mississippi</option>
-        	<option value="MO">Missouri</option>
-        	<option value="MT">Montana</option>
-        	<option value="NE">Nebraska</option>
-        	<option value="NV">Nevada</option>
-        	<option value="NH">New Hampshire</option>
-        	<option value="NJ">New Jersey</option>
-        	<option value="NM">New Mexico</option>
-        	<option value="NY">New York</option>
-        	<option value="NC">North Carolina</option>
-        	<option value="ND">North Dakota</option>
-        	<option value="OH">Ohio</option>
-        	<option value="OK">Oklahoma</option>
-        	<option value="OR">Oregon</option>
-        	<option value="PA">Pennsylvania</option>
-        	<option value="RI">Rhode Island</option>
-        	<option value="SC">South Carolina</option>
-        	<option value="SD">South Dakota</option>
-        	<option value="TN">Tennessee</option>
-        	<option value="TX">Texas</option>
-        	<option value="UT">Utah</option>
-        	<option value="VT">Vermont</option>
-        	<option value="VA">Virginia</option>
-        	<option value="WA">Washington</option>
-        	<option value="WV">West Virginia</option>
-        	<option value="WI">Wisconsin</option>
-        	<option value="WY">Wyoming</option>
-      </select>
+          <option value="">Select a state</option>
+          {States.map(({ code, name }) => (
+            <option key={code} value={code}>
+              {name}
+            </option>
+          ))}
+        </select>
       </div>
 
       {loading && <p className="text-center">Loading events...</p>}
       {error && (
         <p className="text-danger text-center">Error fetching events.</p>
       )}
-
+      {uniqueEvents.length === 0 && !loading && !error && (
+        <p className="text-center text-muted">
+          No events found for "{searchTerm}". Please try a different keyword or
+          state.
+        </p>
+      )}
       <div className="row">
         {sortedEvents.map((event) => (
           <div
@@ -165,6 +125,5 @@ export default function EventsPage() {
         ))}
       </div>
     </div>
-
   );
 }

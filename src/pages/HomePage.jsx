@@ -1,7 +1,6 @@
-
-import React, { useState, useEffect } from "react";
-import { Button, Form, Container, Row, Col, Card } from "react-bootstrap";
-import backgroundImage from "../assets/images/ph1.jpg";
+import React, { useState, useEffect } from 'react';
+import { Button, Form, Container, Row, Col, Card } from 'react-bootstrap';
+import backgroundImage from '../assets/images/ph2.jpg';
 
 export default function HomePage() {
   const [email, setEmail] = useState('');
@@ -24,43 +23,47 @@ export default function HomePage() {
   const loginWithGoogle = (e) => {
     e.preventDefault();
     try {
-      window.location.href = "http://localhost:8000/login";
+      window.location.href = 'http://localhost:8000/login';
     } catch (error) {
-      console.error("Login redirection failed:", error);
-      alert("Failed to redirect to Google login. Please try again.");
+      console.error('Login redirection failed:', error);
+      alert('Failed to redirect to Google login. Please try again.');
     }
   };
 
   return (
     <div
       style={{
-        background: `linear-gradient(to right, rgba(203, 210, 213, 0.7), rgba(124, 121, 118, 0.7)), url(${backgroundImage})`,
+        background: ` url(${backgroundImage})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         height: '100vh',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        color: 'white',
+        color: '#fff',
+        padding: '0 10px',
       }}
     >
       <Container>
         <Row>
-          <Col md={6}>
+          <Col md={5}>
             <Card
               style={{
-<
-                padding: "2rem",
-                borderRadius: "15px",
-                boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
-
+                padding: '2rem',
+                borderRadius: '20px',
+                boxShadow: '0 8px 16px rgba(0, 0, 0, 0.2)',
+                background: 'rgba(255, 255, 255,0.6)',
               }}
             >
               <Card.Body>
                 <h3
                   className="text-center"
-
-                  style={{ fontSize: "2rem", marginBottom: "1rem" }}
+                  style={{
+                    fontSize: '2.5rem',
+                    fontWeight: 'bold',
+                    marginBottom: '1rem',
+                    color: '#333',
+                  }}
                 >
                   Login
                 </h3>
@@ -68,8 +71,7 @@ export default function HomePage() {
                   {/* Email field */}
                   <Form.Group
                     controlId="formBasicEmail"
-                    style={{ marginBottom: "1.5rem" }}
-
+                    style={{ marginBottom: '1.5rem' }}
                   >
                     <Form.Label>Email address</Form.Label>
                     <Form.Control
@@ -84,9 +86,7 @@ export default function HomePage() {
                   {/* Password field */}
                   <Form.Group
                     controlId="formBasicPassword"
-
-                    style={{ marginBottom: "1.5rem" }}
-
+                    style={{ marginBottom: '1.5rem' }}
                   >
                     <Form.Label>Password</Form.Label>
                     <Form.Control
@@ -102,9 +102,7 @@ export default function HomePage() {
                   {error && (
                     <p
                       className="text-danger"
-
-                      style={{ fontSize: "1rem", marginBottom: "1rem" }}
-
+                      style={{ fontSize: '1rem', marginBottom: '1rem' }}
                     >
                       {error}
                     </p>
@@ -114,11 +112,9 @@ export default function HomePage() {
                   <Button
                     variant="primary"
                     type="submit"
-
                     className="w-100"
-                    style={{ padding: "1rem", fontSize: "1.2rem" }}
+                    style={{ padding: '1rem', fontSize: '1.2rem' }}
                     onClick={handleLogin}
-
                   >
                     Login
                   </Button>
@@ -127,9 +123,9 @@ export default function HomePage() {
                     type="submit"
                     className="w-100"
                     style={{
-                      marginTop: "10px",
-                      padding: "1rem",
-                      fontSize: "1.2rem",
+                      marginTop: '10px',
+                      padding: '1rem',
+                      fontSize: '1.2rem',
                     }}
                     onClick={loginWithGoogle}
                   >
