@@ -7,7 +7,6 @@ const addEvent = ({ displayed, onClose, onSave }) => {
     title: "",
     start: "",
     end: "",
-    userId: "1",
   });
 
   const inputStyle = {

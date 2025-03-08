@@ -18,7 +18,16 @@ export default function CalendarPage({ onLogin, isLoggedIn }) {
 
   const addEvent = (eventData) => {
     addEventPopUp ? hideAddEvent() : 0;
-    setCurrentEvents((events) => [...events, eventData]);
+
+    const addEvent = {
+      title: eventData.title,
+      start: eventData.start,
+      end: eventData.end,
+      userId: loggedInUser.userId,
+    };
+
+    addEventsToSupabase(addEvent);
+    setCurrentEvents((events) => [...events, addEvent]);
   };
 
   const formatDateTime = (isoString) => {
