@@ -61,6 +61,7 @@ function App() {
           }
         />
         <Route path="/search" element={<EventsPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
       </Routes>
     </Router>
   );
