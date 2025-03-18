@@ -156,7 +156,7 @@ export default function ProfilePage() {
                             <Form.Control type="email" onChange={(e) => {setNewUserEmail(e.target.value)}} defaultValue={userEmail} />
                           </Form.Group>
 
-                          <Form.Select aria-label="Default select example" onChange={(e) => {setNewUserEventColor(e.target.value)}}>
+                          <Form.Select padding="sm" aria-label="Default select example" onChange={(e) => {setNewUserEventColor(e.target.value)}}>
                             <option value={userEventColor}>Event Color</option>
                             <option value="DarkOrange">Dark Orange</option>
                             <option value="Crimson">Crimson</option>

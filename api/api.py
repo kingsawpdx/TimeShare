@@ -64,9 +64,13 @@ def require_arg_for_method(request: Request, arg_name: str, *methods: tuple[str,
     """
 
     arg = request.args.get(arg_name)
+    print(f"required arg {arg_name}: {arg}    {request.method} in {methods}")
 
-    if any([request.method == method] for method in methods):
+    truth_table = [request.method == method for method in methods] 
+    print(truth_table)
+    if any(truth_table):
         if arg is None:
+            print(f"arg is required: {arg_name}")
             raise Exception(f"{arg_name} is required")
     return arg
 
@@ -89,7 +93,7 @@ def events() -> Response:
     # json data for events, 
     event_json: dict | list | None = None
 
-    print("EVENTS QUERIED")
+    print("/events/", request.method, request.args)
 
     # Get required arguments for each method
     try:
@@ -97,14 +101,14 @@ def events() -> Response:
         event_id = require_arg_for_method(request, 'eventId', 'PATCH', 'DELETE')
 
     except Exception as e:
-        print(e)
-        return jsonify({"error": e.args[0]}), 400
+        return jsonify({"error": str(e)}), 400
 
-    print("Retrieved Required stuff")
+    print("Retrieved Required stuff") # Debugging
 
     # If the method needs event data, retrieve it
     if request.method in ["POST", "PATCH"]:
         event_json = request.get_json()
+        print("/event/ event JSON data:", event_json)
         if not event_json:
             print("events required")
             return jsonify({"error": "event is required"}), 400
@@ -124,6 +128,7 @@ def events() -> Response:
 
             return jsonify(response.data), 200
         except Exception as error:
+            print(error)
             return jsonify({"error:": str(error)}), 500
 
 

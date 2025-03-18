@@ -44,21 +44,23 @@ class DBInterface:
         :raises APIError: Raised if the API raised an error
         """
 
+        print("DBInterface: event(s):", events)
+
         # convert single event to a list 
         if isinstance(events, dict):
             events = [events]
 
-        response = (
+        events_list = [ {
+                "title": event.get("title"),
+                "userId": event.get("userId"),
+                "start": event.get("start"),
+                "end": event.get("end")
+            } for event in events
+        ]
+
+        return (
             self.supabase.table("events")
-                .insert([
-                    {
-                        "title": event.get("title"),
-                        "userId": event.get("userId"),
-                        "start": event.get("start"),
-                        "end": event.get("end")
-                    } 
-                    for event in events
-                ])
+                .insert(events_list)
                 .execute()
         )
 

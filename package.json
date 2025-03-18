@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "start-api": "cd api && .venv/bin/flask run --no-debugger",
+    "start-api": "cd api && .venv/bin/flask run --port=8000 --no-debugger",
     "test": "vitest"
   },
   "devDependencies": {
