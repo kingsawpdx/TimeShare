@@ -27,4 +27,5 @@ dist-ssr
 
 # Python virtual environment exclusions
 api/.venv
+api/flask_session
 **/__pycache__

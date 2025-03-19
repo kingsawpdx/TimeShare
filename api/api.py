@@ -1,22 +1,25 @@
-from flask import Flask, request, jsonify, abort, redirect, session, render_template, url_for
-import os
-from supabase import create_client, Client
-from flask_cors import CORS
-from flask_session import Session
+from flask import Flask, Request, Response, request, jsonify, abort, redirect, session, render_template, url_for
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
+from supabase import create_client, Client
+import os
+from flask_cors import CORS
+from flask_session import Session
 import random
 
-from api.google_utility.auth import (
+from api.google_utility import (
     get_id_info,
     get_flow    
 )
 
 from api.config import Config
 
+from .db_interface import DBInterface
+
+database = DBInterface()
 url = os.environ.get("SUPABASE_URL")
 key = os.environ.get("SUPABASE_KEY")
-supabase = create_client(url,key)
+supabase: Client = create_client(url,key)
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -46,186 +49,178 @@ def save_session(response):
     session.modified = True
     return response
 
+#@app.route('/profileDetails', methods=['GET', 'POST', 'PATCH'])
+
+def require_arg_for_method(request: Request, arg_name: str, *methods: tuple[str, ...]):
+    """
+    Guards against missing arguments for certain method calls
+
+    :param request: flask.Request to fetch args from
+    :param arg_name: Name of the argument to retrieve
+    :param *methods: Methods to require argument for
+    :returns: Requested arg, either None or the argument
+    :raises Exception: If the argument is missing, but required for the method,
+    contains a string stating "{arg_name} is required"
+    """
+
+    arg = request.args.get(arg_name)
+    print(f"required arg {arg_name}: {arg}    {request.method} in {methods}")
+
+    truth_table = [request.method == method for method in methods] 
+    print(truth_table)
+    if any(truth_table):
+        if arg is None:
+            print(f"arg is required: {arg_name}")
+            raise Exception(f"{arg_name} is required")
+    return arg
 
 @app.route('/events/', methods=['GET', 'POST', 'PATCH', 'DELETE'])
-def events():
+def events() -> Response:
+    """
+    Handles the events API calls
+
+    :GET: Retrieves all of the events associated with user from the request arg "userId"
+    :POST: Inserts the event(s) in the json data into the database
+    :PATCH: Updates the event in the database specified with the "eventId" arg with the json data
+    :DELETE: Deletes the event associated with the "eventId" arg
+    """
+    # arg 'userId', if used
+    user_id: str | None = None
+
+    # arg 'eventId', if used
+    event_id: str | None = None
+
+    # json data for events, 
+    event_json: dict | list | None = None
+
+    print("/events/", request.method, request.args)
+
+    # Get required arguments for each method
+    try:
+        user_id = require_arg_for_method(request, 'userId', 'GET')
+        event_id = require_arg_for_method(request, 'eventId', 'PATCH', 'DELETE')
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+    print("Retrieved Required stuff") # Debugging
+
+    # If the method needs event data, retrieve it
+    if request.method in ["POST", "PATCH"]:
+        event_json = request.get_json()
+        print("/event/ event JSON data:", event_json)
+        if not event_json:
+            print("events required")
+            return jsonify({"error": "event is required"}), 400
+
+
     if request.method == 'GET': 
-        user_id = request.args.get('userId')
-
-        if not user_id:
-            return jsonify({"error": "userId is require"}), 400
-        
         try:
-            response = (
-                supabase.table("events")
-                .select("*")
-                .eq("userId", user_id)
-                .execute()
-            )
-
-            events = response.data
-            
+            return database.get_user_events(user_id).data
+        
         except Exception as error:
             return jsonify({"error": str(error)}), 500
-
-        return events
     
-    elif request.method == 'POST':
-        events = request.get_json()
 
-        if not events:
-            return jsonify({"error": "event is required"}), 400
-        
-        if isinstance(events, dict):
-            events = [events]
-        
+    elif request.method == 'POST':
         try:
-            response = (
-                supabase.table("events")
-                .insert([
-                    {
-                        "title": event.get("title"),
-                        "userId": event.get("userId"),
-                        "start": event.get("start"),
-                        "end": event.get("end")
-                    } 
-                    for event in events
-                ])
-                .execute()
-            )
+            response = database.insert_events(event_json)
 
             return jsonify(response.data), 200
-    
         except Exception as error:
+            print(error)
             return jsonify({"error:": str(error)}), 500
 
-    elif request.method == 'PATCH':
-        eventId = request.args.get('eventId')
-        updateEvent = request.get_json()
 
-        if not updateEvent or eventId:
-            return jsonify({"error": "event and eventId required"}), 400
-        
+    elif request.method == 'PATCH':
         try:
-            response = (
-                supabase.table("events")
-                .update({
-                        "title": updateEvent["title"],
-                        "start": updateEvent["start"],
-                        "end": updateEvent["end"]
-                })
-                .eq("id", eventId)
-                .execute()
-            )
+            database.update_event(event_id, event_json)
+
         except Exception as error:
             return jsonify({"error:": str(error)}), 500
         return "Successfully updated event"
     
+
     elif request.method == 'DELETE':
-        eventId = request.args.get('eventId')
-
-        if not eventId:
-            return jsonify({"error": "eventId is required"}), 400
-
         try:
-            response = (
-                supabase.table("events")
-                .delete()
-                .eq("id", eventId)
-                .execute()
-            )
+            database.delete_event(event_id)
         except Exception as error:
             return jsonify({"error": str(error)}), 500
-        
-        return "Successfully deleted"
+        return "Successfully deleted event"
     
+
+
 @app.route('/users/', methods=['GET', 'POST', 'PATCH'])
 def users():
-    if request.method == 'GET': 
+    # arg 'userId', if used
+    user_id: str | None = None
 
-        userId = request.args.get("userId")
+    # json data for user
+    user_json: dict | None = None
 
-        if(userId):
-
-            try:
-                response = (
-                    supabase.table("users")
-                    .select("*")
-                    .eq("userId", userId)
-                    .execute()
-                )
-
-                user = response.data
-
+    # Get required/optional arguments for each method
+    try:
+        print(f"Trying to get userId {request}")
+        user_id = require_arg_for_method(request, 'userId', 'PATCH')
+    except Exception as e:
+        print(f"Failed {e}")
+        return jsonify({"error": e.args}), 400
+    
+    if request.method == 'PATCH':
+        user_json = request.get_json()
+        if user_json is None:
+            return jsonify({"error": "userUpdate and userId required"}), 400
+    
+    try:
+        if request.method == 'GET':
+            if user_id is not None:
+                user = database.get_single_user(user_id).data
                 if not user:
+                    print(f"User not found {user_id}")
                     return jsonify({"error": "User not found"}), 404
                 return jsonify({"user": user[0]}), 200
-                
-            except Exception as error:
-                return jsonify({"error": str(error)}), 500
-        else:
-            try:
-                response = (
-                    supabase.table("users")
-                    .select("*")
-                    .execute()
-                )
-
-                users = response.data
-
+            
+            else:
+                users = database.get_all_users().data
                 if not users:
                     return jsonify({"error": "Users not found"}), 404
-                return jsonify({"users": users}), 200
-                
-            except Exception as error:
-                return jsonify({"error": str(error)}), 500
-        
+                return jsonify({"users": users}), 200            
 
-    elif request.method == 'POST':
-        colors = ['DarkOrange', 'Crimson', 'ForestGreen', 'SkyBlue', 'Teal', 'Tomato', 'Violet']
-        try:
 
+        elif request.method == 'POST':
+            colors = ['DarkOrange', 'Crimson', 'ForestGreen', 'SkyBlue', 'Teal', 'Tomato', 'Violet']
             colorIndex = random.randrange(len(colors))
 
             user_data = request.get_json()
             
-            new_user = {
-                "userId": user_data.get("userId"),
-                "name": user_data.get("name"),
-                "email": user_data.get("email"),
-                "profileImage": user_data.get("profileImage"),
-            }
+            print(user_data)
 
-            insert_response = (
-                supabase.table("users")
-                .insert({
-                    "userId": user_data["userId"],
-                    "name": user_data["name"],
-                    "email": user_data["email"],
-                    "eventColor": colors[colorIndex],
-                    "linkedUsers": "{}",
-                    "profileImage": user_data["profileImage"],
-                })
-                .execute()
+            database.insert_user(
+                user_id         = user_data.get("userId"),
+                name            = user_data.get("name"),
+                email           = user_data.get("email"),
+                event_color     = colors[colorIndex],
+                profile_image   = user_data.get("profileImage")
             )
 
-            return jsonify({"message": "User added", "user": new_user}), 201
-
-        except Exception as error:
-            return jsonify({"error": str(error)}), 500
-    
-    elif request.method == 'PATCH':
-
-        userId = str(request.args.get('userId'))
-        userUpdate = request.get_json()
-
-        print("Received userId:", userId)  # Debugging log
-        print("Received userUpdate:", userUpdate)  # Debugging log
-
-        if not userUpdate or not userId:
-            return jsonify({"error": "userUpdate and userId required"}), 400
+            return jsonify(
+                { 
+                    "message": "User added", 
+                    "user": {
+                        "userId":       user_data.get("userId"),
+                        "name":         user_data.get("name"),
+                        "email":        user_data.get("email"),
+                        "profileImage": user_data.get("profileImage"),
+                    }
+                }
+            ), 201
         
-        try:
+        elif request.method == 'PATCH':
+            userUpdate = request.get_json()
+
+            print("Received userId:", user_id)  # Debugging log
+            print("Received userUpdate:", userUpdate)  # Debugging log
+            
             response = (
                 supabase.table("users")
                 .update({
@@ -236,16 +231,17 @@ def users():
                         "email": userUpdate.get("email"),
 
                 })
-                .eq("userId", userId)
+                .eq("userId", user_id)
                 .execute()
             )
             print("Supabase response:", response)  # Debugging log
 
-        except Exception as error:
-            print("Error updating user:", str(error))  # Debugging log
-            return jsonify({"error": str(error)}), 500
+            return jsonify(response.data),200
+        
+    except Exception as error:
+        print(f"Error in /users/ method={request.method}:", str(error)) # Debugging log
+        return jsonify({"error": str(error)}), 500
 
-        return jsonify(response.data),200
     
 @app.route("/login")
 def login():

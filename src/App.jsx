@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import CalendarPage from "./pages/CalendarPage";
 import EventsPage from "./pages/EventsPage";
+import ProfilePage from "./pages/ProfilePage";
 import "./styles.css";
 
 function App() {
@@ -53,7 +54,14 @@ function App() {
             <CalendarPage onLogin={handleLogin} isLoggedIn={isLoggedIn} />
           }
         />
+        <Route
+          path="/profile"
+          element={
+            <ProfilePage />
+          }
+        />
         <Route path="/search" element={<EventsPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
       </Routes>
     </Router>
   );

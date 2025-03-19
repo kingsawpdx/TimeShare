@@ -35,6 +35,12 @@ function NavMenu({ isLoggedIn, onLogout }) {
             <Nav.Link as={Link} to="/search" className="text-light">
               Events
             </Nav.Link>
+
+            {isLoggedIn && (
+              <Nav.Link as={Link} to="/profile" className="text-light">
+              Profile
+              </Nav.Link>
+            )}
             {isLoggedIn && (
               <Nav.Link
                 as={Link}
